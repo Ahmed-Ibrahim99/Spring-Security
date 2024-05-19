@@ -2,36 +2,38 @@ package com.amaghrabi.security.service;
 
 import com.amaghrabi.security.auth.AuthenticationResponse;
 import com.amaghrabi.security.config.jwt.JwtService;
-import com.amaghrabi.security.dto.AuthenticationRequest;
-import com.amaghrabi.security.dto.RegisterRequest;
-import com.amaghrabi.security.model.EmailTemplateName;
-import com.amaghrabi.security.model.Token;
-import com.amaghrabi.security.model.User;
-import com.amaghrabi.security.repository.RoleRepository;
-import com.amaghrabi.security.repository.TokenRepository;
-import com.amaghrabi.security.repository.UserRepository;
+import com.amaghrabi.security.dto.*;
+import com.amaghrabi.security.model.*;
+import com.amaghrabi.security.repository.*;
 import jakarta.mail.MessagingException;
-import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class UserService {
-
+public class UserService implements LogoutHandler {
+    private AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
     private final TokenRepository tokenRepository;
+    private final JwtTokenRepository jwtTokenRepository;
     private final RoleRepository roleRepository;
     private final EmailService emailService;
 
@@ -41,17 +43,22 @@ public class UserService {
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService,
-                       AuthenticationManager authenticationManager,
                        TokenRepository tokenRepository,
+                       JwtTokenRepository jwtTokenRepository,
                        RoleRepository roleRepository,
                        EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
         this.tokenRepository = tokenRepository;
+        this.jwtTokenRepository = jwtTokenRepository;
         this.roleRepository = roleRepository;
         this.emailService = emailService;
+    }
+
+    @Autowired
+    public void setAuthenticationManager(@Lazy AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     public void register(RegisterRequest request) throws MessagingException {
@@ -83,9 +90,21 @@ public class UserService {
         claims.put("fullName", user.getFullName());
 
         var jwtToken = jwtService.generateToken(claims, (User) auth.getPrincipal());
+        this.revokeAllUserTokens(user);
+        this.saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    public List<UserResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> UserResponse.builder()
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(user.getEmail())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public void activateAccount(String token) throws MessagingException {
@@ -143,5 +162,43 @@ public class UserService {
             codeBuilder.append(characters.charAt(randomIndex));
         }
         return codeBuilder.toString();
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = JwtToken.builder()
+                .user(user)
+                .token(jwtToken)
+                .expired(false)
+                .build();
+        jwtTokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = jwtTokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+        });
+        jwtTokenRepository.saveAll(validUserTokens);
+    }
+
+    @Override
+    public void logout(HttpServletRequest request,
+                       HttpServletResponse response,
+                       Authentication authentication) {
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+        jwt = authHeader.substring(7);
+        var storedToken = jwtTokenRepository.findByToken(jwt)
+                .orElse(null);
+        if (storedToken != null) {
+            storedToken.setExpired(true);
+            jwtTokenRepository.save(storedToken);
+            SecurityContextHolder.clearContext();
+        }
     }
 }

@@ -39,6 +39,8 @@ public class User implements UserDetails, Principal {
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+    @OneToMany(mappedBy = "user")
+    private List<JwtToken> jwtTokens;
     private boolean accountLocked;
     private boolean isEnabled;
     @CreatedDate

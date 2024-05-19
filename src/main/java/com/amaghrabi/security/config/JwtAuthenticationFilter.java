@@ -1,6 +1,7 @@
 package com.amaghrabi.security.config;
 
 import com.amaghrabi.security.config.jwt.JwtService;
+import com.amaghrabi.security.repository.JwtTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,10 +22,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final JwtTokenRepository jwtTokenRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtService jwtService,
+                                   UserDetailsService userDetailsService,
+                                   JwtTokenRepository jwtTokenRepository) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.jwtTokenRepository = jwtTokenRepository;
     }
 
     @Override
@@ -50,7 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            boolean isTokenValid = jwtTokenRepository.findByToken(jwt)
+                    .map(t -> !t.isExpired())
+                    .orElse(false);
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
