@@ -1,4 +1,4 @@
-package com.amaghrabi.security.auth;
+package com.amaghrabi.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

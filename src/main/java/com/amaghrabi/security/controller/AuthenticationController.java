@@ -1,6 +1,6 @@
 package com.amaghrabi.security.controller;
 
-import com.amaghrabi.security.auth.AuthenticationResponse;
+import com.amaghrabi.security.dto.AuthenticationResponse;
 import com.amaghrabi.security.dto.AuthenticationRequest;
 import com.amaghrabi.security.dto.RegisterRequest;
 import com.amaghrabi.security.service.UserService;

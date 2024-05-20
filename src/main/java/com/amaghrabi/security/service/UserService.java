@@ -1,6 +1,6 @@
 package com.amaghrabi.security.service;
 
-import com.amaghrabi.security.auth.AuthenticationResponse;
+import com.amaghrabi.security.dto.AuthenticationResponse;
 import com.amaghrabi.security.config.jwt.JwtService;
 import com.amaghrabi.security.dto.*;
 import com.amaghrabi.security.model.*;
@@ -62,7 +62,7 @@ public class UserService implements LogoutHandler {
     }
 
     public void register(RegisterRequest request) throws MessagingException {
-        var userRole = roleRepository.findByName("USER")
+        var userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
         var user = User.builder()
                 .firstName(request.getFirstname())

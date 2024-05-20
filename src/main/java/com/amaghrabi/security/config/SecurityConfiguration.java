@@ -49,9 +49,10 @@ public class SecurityConfiguration {
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers(WHITE_LIST_URL).permitAll()
-                                .requestMatchers("/admin/**").hasRole("ADMIN") // Only users with ADMIN role can access /admin/**
-                                .requestMatchers("/user/**").hasRole("USER")
+                        req
+                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/user/**").hasRole("USER")
+                                .requestMatchers(WHITE_LIST_URL).permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
