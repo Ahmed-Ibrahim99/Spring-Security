@@ -16,6 +16,7 @@ public class JwtToken {
     @Column(unique = true)
     @GeneratedValue
     private Integer id;
+    @Column(length = 512)
     private String token;
     private boolean expired;
     @ManyToOne(fetch = FetchType.LAZY)
