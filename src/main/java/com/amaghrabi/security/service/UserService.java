@@ -94,6 +94,7 @@ public class UserService implements LogoutHandler {
         this.saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .fullName(user.getFullName())
                 .build();
     }
 
