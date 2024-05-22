@@ -1,0 +1,14 @@
+<q2>
+    <deploy>
+        <adapter class="org.jpos.q2.iso.QServer" logger="Q2" name="my-server" realm="simpleServer">
+            <channel class="org.jpos.iso.channel.ASCIIChannel" packager="org.jpos.iso.packager.GenericPackager">
+                <property name="packager-config" value="classpath:iso8583/packager.xml"/>
+                <property name="host" value="localhost"/>
+                <property name="port" value="8000"/>
+            </channel>
+            <request-listener class="org.jpos.iso.QServer$SimpleRequestListener">
+                <response-handler class="com.amaghrabi.security.service.Iso8583Service"/>
+            </request-listener>
+        </adapter>
+    </deploy>
+</q2>
