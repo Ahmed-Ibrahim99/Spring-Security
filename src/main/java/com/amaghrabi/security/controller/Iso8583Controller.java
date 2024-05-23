@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/iso8583")
 public class Iso8583Controller {
@@ -14,8 +16,8 @@ public class Iso8583Controller {
         this.iso8583Service = iso8583Service;
     }
 
-    @GetMapping("/test")
-    public String testIso8583() {
+    @GetMapping("/get-message")
+    public Map<String, Object> processMessage() {
         return iso8583Service.processIso8583Message();
     }
 }
