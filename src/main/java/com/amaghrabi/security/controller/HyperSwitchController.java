@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/hyperswitch-payment")
+@RequestMapping("/hyper-switch-payment")
 public class HyperSwitchController {
 
     private final HyperSwitchService hyperSwitchService;

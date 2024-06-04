@@ -1,4 +1,5 @@
 package com.amaghrabi.security.service;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 @Service
 public class HyperSwitchService {
 
@@ -36,7 +38,8 @@ public class HyperSwitchService {
             int responseCode = conn.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),
+                        "utf-8"))) {
                     StringBuilder response = new StringBuilder();
                     String responseLine;
                     while ((responseLine = br.readLine()) != null) {
