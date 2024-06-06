@@ -21,7 +21,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**",
+    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**","/hyperswitch-payment/**",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                         req
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/v1/user/**").hasRole("USER")
+//                                .requestMatchers("/hyperswitch-payment/**").hasRole("USER")
                                 .requestMatchers(WHITE_LIST_URL).permitAll()
                                 .anyRequest()
                                 .authenticated()
