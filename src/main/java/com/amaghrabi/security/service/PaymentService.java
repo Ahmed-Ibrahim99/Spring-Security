@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class PaymentService {
 
     public PaymentIntent createPaymentIntent(Long amount) throws StripeException {
-        System.out.println("testPaymentIntent++++++++");
+//        System.out.println("testPaymentIntent++++++++");
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amount)
                 .setCurrency("usd")
@@ -17,7 +17,7 @@ public class PaymentService {
                         PaymentIntentCreateParams.AutomaticPaymentMethods.builder().setEnabled(true).build()
                 )
                 .build();
-        System.out.println("testPaymentIntent++++++++"+params.toString());
+//        System.out.println("testPaymentIntent++++++++"+params.toString());
         return PaymentIntent.create(params);
     }
 }

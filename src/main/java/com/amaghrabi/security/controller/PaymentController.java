@@ -23,12 +23,12 @@ public class PaymentController {
     public ResponseEntity<Map<String, String>> createPaymentIntent(@RequestParam Long amount) {
         try {
             PaymentIntent paymentIntent = paymentService.createPaymentIntent(amount);
-            System.out.println("testPaymentIntent>>>>>>>>>>"+paymentIntent);
+//            System.out.println("testPaymentIntent>>>>>>>>>>"+paymentIntent);
             Map<String, String> responseData = new HashMap<>();
             responseData.put("clientSecret", paymentIntent.getClientSecret());
             return ResponseEntity.ok(responseData);
         } catch (StripeException e) {
-            System.out.println("testPaymentIntent");
+//            System.out.println("testPaymentIntent");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
