@@ -33,7 +33,9 @@ public class SecurityConfiguration {
             "/swagger-ui.html",
             "/api/iso8583/**",
             "/hyper-switch-payment/**",
-            "/paymob-payment/**"};
+            "/paymob-payment/**",
+            "/fawry-payment/**",
+            "/stripe-payment/**"};
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final UserService userService;

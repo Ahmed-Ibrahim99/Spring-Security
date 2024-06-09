@@ -39,7 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // If the request is to the authentication endpoint, bypass the filter
         String requestPath = request.getServletPath();
-        if (requestPath.contains("/api/v1/auth") || requestPath.contains("/paymob-payment/create")) {
+        if (requestPath.contains("/api/v1/auth") ||
+                requestPath.contains("/paymob-payment/create") ||
+                requestPath.contains("/stripe-payment/**")) {
             filterChain.doFilter(request, response);
             return;
         }
