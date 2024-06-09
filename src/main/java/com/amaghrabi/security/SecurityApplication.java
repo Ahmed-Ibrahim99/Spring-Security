@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class SecurityApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SecurityApplication.class, args);
+        SpringApplication.run(SecurityApplication.class,args);
     }
 
     @Bean
